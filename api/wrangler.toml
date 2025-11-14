@@ -1,6 +1,6 @@
 name = "fluentai-api"
 main = "src/index.js"
-compatibility_date = "2024-11-13"
+compatibility_date = "2025-11-14"
 
 [ai]
 binding = "AI"

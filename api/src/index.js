@@ -1,6 +1,5 @@
 export default {
   async fetch(request, env) {
-    // CORS handling
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -34,9 +33,7 @@ Examples:
 Input: "spanish" → {"isValid": true, "standardName": "Spanish", "suggestion": "Spanish is ready to learn!"}
 Input: "spansh" → {"isValid": false, "standardName": null, "suggestion": "Did you mean Spanish?"}
 Input: "klingon" → {"isValid": false, "standardName": null, "suggestion": "Klingon is a fictional language. Try a real language like Spanish, French, or Mandarin."}
-Input: "mandarin" → {"isValid": true, "standardName": "Mandarin Chinese", "suggestion": "Mandarin Chinese is ready to learn!"}
-
-Be strict: only accept real-world spoken/signed languages.`
+Input: "mandarin" → {"isValid": true, "standardName": "Mandarin Chinese", "suggestion": "Mandarin Chinese is ready to learn!"}`
             },
             {
               role: 'user',
@@ -47,8 +44,7 @@ Be strict: only accept real-world spoken/signed languages.`
           max_tokens: 200
         });
 
-        let result = aiResponse.response;
-
+        const result = normalizeAIJson(aiResponse.response)
         return new Response(JSON.stringify(result), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
@@ -66,7 +62,21 @@ Be strict: only accept real-world spoken/signed languages.`
       }
     }
 
-    // Health check
+    function normalizeAIJson(output) {
+      if (!output) return null;
+
+      let text = typeof output === 'string' ? output : JSON.stringify(output);
+
+      text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        console.error("JSON parse failed. Raw:", text);
+        return null;
+      }
+    }
+
     if (url.pathname === '/api/health') {
       return new Response(JSON.stringify({ status: 'ok', message: 'FluentAI API is running!' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
