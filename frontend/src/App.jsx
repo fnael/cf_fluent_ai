@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
-import { Globe, Plus, ArrowRight, Trash2, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import { Globe, Plus, ArrowRight, Trash2, Sparkles, AlertCircle, CheckCircle, MessageCircle, BookOpen, Brain } from 'lucide-react';
+import Practice from './Practice';
 import './index.css';
 
 const API_BASE = 'http://localhost:8787';
@@ -9,9 +9,10 @@ export default function FluentAI() {
   const [languages, setLanguages] = useState([]);
   const [newLanguage, setNewLanguage] = useState('');
   const [currentView, setCurrentView] = useState('menu');
+  const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [validationMessage, setValidationMessage] = useState('');
-  const [validationType, setValidationType] = useState(''); // 'success', 'error', 'warning'
+  const [validationType, setValidationType] = useState('');
 
   useEffect(() => {
     loadLanguages();
@@ -58,15 +59,15 @@ export default function FluentAI() {
       const result = await response.json();
 
       if (result.isValid) {
-        setValidationType('success')
-        setValidationMessage(result.suggestion)
+        setValidationType('success');
+        setValidationMessage(result.suggestion);
         const updatedLanguages = [...languages, result.standardName];
         setLanguages(updatedLanguages);
         await saveLanguages(updatedLanguages);
         setNewLanguage('');
       } else {
-        setValidationType('error')
-        setValidationMessage(result.suggestion)
+        setValidationType('error');
+        setValidationMessage(result.suggestion);
       }
     } catch (error) {
       console.error('Error validating language:', error);
@@ -84,14 +85,22 @@ export default function FluentAI() {
   };
 
   const navigateToLanguage = (language) => {
-    setCurrentView(language.toLowerCase());
+    setSelectedLanguage(language);
+    setCurrentView('language-menu');
   };
 
   const backToMenu = () => {
     setCurrentView('menu');
+    setSelectedLanguage(null);
   };
 
-  if (currentView !== 'menu') {
+  // Practice view
+  if (currentView === 'practice') {
+    return <Practice language={selectedLanguage} onBack={() => setCurrentView('language-menu')} />;
+  }
+
+  // Language menu (Practice, Translate, Quiz buttons)
+  if (currentView === 'language-menu') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
@@ -99,12 +108,66 @@ export default function FluentAI() {
             onClick={backToMenu}
             className="mb-6 text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-2 transition-colors"
           >
-            Back to Menu
+            ← Back to Menu
           </button>
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            {currentView.charAt(0).toUpperCase() + currentView.slice(1)}
-          </h1>
-          <p className="text-gray-600 text-lg">Language learning features coming soon!</p>
+
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+              {selectedLanguage}
+            </h1>
+            <p className="text-gray-600">Choose how you want to learn</p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Practice Button */}
+            <button
+              onClick={() => setCurrentView('practice')}
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white p-6 rounded-xl transition-all hover:shadow-lg flex items-center justify-between group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-3 rounded-lg">
+                  <MessageCircle className="w-8 h-8" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold">Practice</h3>
+                  <p className="text-indigo-100 text-sm">Chat with AI in {selectedLanguage}</p>
+                </div>
+              </div>
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            </button>
+
+            {/* Translate Button (Coming Soon) */}
+            <button
+              disabled
+              className="w-full bg-gray-100 text-gray-400 p-6 rounded-xl flex items-center justify-between cursor-not-allowed"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-gray-200 p-3 rounded-lg">
+                  <BookOpen className="w-8 h-8" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold">Translate & Lookup</h3>
+                  <p className="text-gray-500 text-sm">Coming soon...</p>
+                </div>
+              </div>
+            </button>
+
+            {/* Quiz Button (Coming Soon) */}
+            <button
+              disabled
+              className="w-full bg-gray-100 text-gray-400 p-6 rounded-xl flex items-center justify-between cursor-not-allowed"
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-gray-200 p-3 rounded-lg">
+                  <Brain className="w-8 h-8" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold">Quiz</h3>
+                  <p className="text-gray-500 text-sm">Coming soon...</p>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -142,10 +205,10 @@ export default function FluentAI() {
               <div className="h-12 mt-2">
                 {validationMessage && (
                   <div className={`mt-3 p-3 rounded-lg flex items-start gap-2 border ${validationType === 'success'
-                    ? 'bg-green-50 border-green-200 text-green-800'
-                    : validationType === 'error'
-                      ? 'bg-red-50 border-red-200 text-red-800'
-                      : 'bg-orange-50 border-orange-200 text-orange-800'
+                      ? 'bg-green-50 border-green-200 text-green-800'
+                      : validationType === 'error'
+                        ? 'bg-red-50 border-red-200 text-red-800'
+                        : 'bg-orange-50 border-orange-200 text-orange-800'
                     }`}>
                     {validationType === 'success' ? (
                       <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -161,7 +224,7 @@ export default function FluentAI() {
             <button
               onClick={addLanguage}
               disabled={!newLanguage.trim()}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium leading-none flex items-center gap-1 self-start"
+              className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-3.5 rounded-lg font-medium leading-none flex items-center gap-1 self-start"
             >
               <Plus className="w-6 h-6" />
               Add
