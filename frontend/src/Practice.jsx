@@ -137,7 +137,6 @@ export default function Practice({ language, onBack }) {
               className="flex items-center gap-2 hover:bg-white/10 px-3 py-2 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
-              Back to {language}
             </button>
             <button
               onClick={clearSession}
@@ -152,9 +151,6 @@ export default function Practice({ language, onBack }) {
             <MessageCircle className="w-8 h-8" />
             <div>
               <h1 className="text-2xl font-bold">Practice {language}</h1>
-              <p className="text-indigo-100 text-sm">
-                Session: {sessionId?.slice(-8)} • Powered by FluentState
-              </p>
             </div>
           </div>
         </div>
@@ -208,9 +204,6 @@ export default function Practice({ language, onBack }) {
               Send
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">
-            Press Enter to send • Conversation stored in Durable Object
-          </p>
         </div>
       </div>
     </div>
