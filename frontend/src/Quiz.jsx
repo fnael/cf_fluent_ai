@@ -27,7 +27,7 @@ export default function Quiz({ language, onBack }) {
 
   const initializeQuiz = async () => {
     try {
-      const newSessionId = `quiz_${language.toLowerCase()}`;
+      const newSessionId = `${language.toLowerCase()}`;
       setSessionId(newSessionId);
 
       // Load stats
