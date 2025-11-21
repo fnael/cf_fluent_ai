@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Send, MessageCircle, Loader, Trash2 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8787';
+const API_BASE = 'https://fluentai-api.fnael-salgado.workers.dev';
 
 export default function Practice({ language, onBack }) {
   const [messages, setMessages] = useState([]);

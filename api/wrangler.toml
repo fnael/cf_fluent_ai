@@ -12,4 +12,4 @@ class_name = "FluentState"
 
 [[migrations]]
 tag = "v1"
-new_classes = [ "FluentState" ]
+new_sqlite_classes = ["FluentState"]

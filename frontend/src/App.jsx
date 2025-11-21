@@ -5,7 +5,7 @@ import Translate from './Translate';
 import Quiz from './Quiz';
 import './index.css';
 
-const API_BASE = 'http://localhost:8787';
+const API_BASE = 'https://fluentai-api.fnael-salgado.workers.dev';
 
 export default function FluentAI() {
   const [languages, setLanguages] = useState([]);

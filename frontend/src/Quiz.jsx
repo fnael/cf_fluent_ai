@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Loader, CheckCircle, XCircle, Trophy, BarChart3 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8787';
+const API_BASE = 'https://fluentai-api.fnael-salgado.workers.dev';
 
 export default function Quiz({ language, onBack }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -139,7 +139,6 @@ export default function Quiz({ language, onBack }) {
           questionText: currentQuestion.question,
           answer,
           correctAnswer: currentQuestion.correctAnswer,
-          difficulty: currentQuestion.difficulty
         })
       });
 
@@ -275,11 +274,6 @@ export default function Quiz({ language, onBack }) {
               <div className="mb-8">
                 <div className="text-sm text-indigo-600 font-medium mb-2">
                   {currentQuestion.type === 'multiple_choice' ? 'Multiple Choice' : 'Quick Answer'}
-                  {currentQuestion.difficulty && (
-                    <span className="ml-2 text-gray-500">
-                      • {currentQuestion.difficulty.replace('-', ' ')}
-                    </span>
-                  )}
                 </div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">
                   {currentQuestion.question}
