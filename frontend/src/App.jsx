@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Globe, Plus, ArrowRight, Trash2, Sparkles, AlertCircle, CheckCircle, MessageCircle, BookOpen, Brain } from 'lucide-react';
 import Practice from './Practice';
+import Translate from './Translate';
+import Quiz from './Quiz';
 import './index.css';
 
 const API_BASE = 'http://localhost:8787';
@@ -78,6 +80,13 @@ export default function FluentAI() {
     const updatedLanguages = languages.filter(lang => lang !== languageToRemove);
     setLanguages(updatedLanguages);
     await saveLanguages(updatedLanguages);
+    await fetch(`${API_BASE}/api/practice/${languageToRemove.toLowerCase()}/clear`, {
+      method: 'DELETE'
+    });
+    await fetch(`${API_BASE}/api/quiz/${languageToRemove.toLowerCase()}/reset`, {
+      method: 'DELETE'
+    });
+
   };
 
   const handleKeyPress = (e) => {
@@ -97,6 +106,21 @@ export default function FluentAI() {
   // Practice view
   if (currentView === 'practice') {
     return <Practice language={selectedLanguage} onBack={() => setCurrentView('language-menu')} />;
+  }
+
+  // Translate view
+  if (currentView === 'translate') {
+    return (
+      <Translate
+        language={selectedLanguage}
+        onBack={() => setCurrentView('language-menu')}
+      />
+    );
+  }
+
+  // Quiz view
+  if (currentView === 'quiz') {
+    return <Quiz language={selectedLanguage} onBack={() => setCurrentView('language-menu')} />;
   }
 
   // Language menu (Practice, Translate, Quiz buttons)
@@ -136,36 +160,38 @@ export default function FluentAI() {
               <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
             </button>
 
-            {/* Translate Button (Coming Soon) */}
+            {/* Translate Button */}
             <button
-              disabled
-              className="w-full bg-gray-100 text-gray-400 p-6 rounded-xl flex items-center justify-between cursor-not-allowed"
+              onClick={() => setCurrentView("translate")}
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white p-6 rounded-xl transition-all hover:shadow-lg flex items-center justify-between group"
             >
               <div className="flex items-center gap-4">
-                <div className="bg-gray-200 p-3 rounded-lg">
+                <div className="bg-white/20 p-3 rounded-lg">
                   <BookOpen className="w-8 h-8" />
                 </div>
                 <div className="text-left">
                   <h3 className="text-xl font-bold">Translate & Lookup</h3>
-                  <p className="text-gray-500 text-sm">Coming soon...</p>
+                  <p className="text-indigo-100 text-sm">Translate between languages</p>
                 </div>
               </div>
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
             </button>
 
-            {/* Quiz Button (Coming Soon) */}
+            {/* Quiz Button */}
             <button
-              disabled
-              className="w-full bg-gray-100 text-gray-400 p-6 rounded-xl flex items-center justify-between cursor-not-allowed"
+              onClick={() => setCurrentView('quiz')}
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white p-6 rounded-xl transition-all hover:shadow-lg flex items-center justify-between group"
             >
               <div className="flex items-center gap-4">
-                <div className="bg-gray-200 p-3 rounded-lg">
+                <div className="bg-white/20 p-3 rounded-lg">
                   <Brain className="w-8 h-8" />
                 </div>
                 <div className="text-left">
                   <h3 className="text-xl font-bold">Quiz</h3>
-                  <p className="text-gray-500 text-sm">Coming soon...</p>
+                  <p className="text-purple-100 text-sm">Test your knowledge</p>
                 </div>
               </div>
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
             </button>
           </div>
         </div>
@@ -205,10 +231,10 @@ export default function FluentAI() {
               <div className="h-12 mt-2">
                 {validationMessage && (
                   <div className={`mt-3 p-3 rounded-lg flex items-start gap-2 border ${validationType === 'success'
-                      ? 'bg-green-50 border-green-200 text-green-800'
-                      : validationType === 'error'
-                        ? 'bg-red-50 border-red-200 text-red-800'
-                        : 'bg-orange-50 border-orange-200 text-orange-800'
+                    ? 'bg-green-50 border-green-200 text-green-800'
+                    : validationType === 'error'
+                      ? 'bg-red-50 border-red-200 text-red-800'
+                      : 'bg-orange-50 border-orange-200 text-orange-800'
                     }`}>
                     {validationType === 'success' ? (
                       <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />

@@ -9,3 +9,7 @@ remote = true
 [[durable_objects.bindings]]
 name = "FLUENT_STATE"
 class_name = "FluentState"
+
+[[migrations]]
+tag = "v1"
+new_classes = [ "FluentState" ]

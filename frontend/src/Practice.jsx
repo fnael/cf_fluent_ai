@@ -20,15 +20,43 @@ export default function Practice({ language, onBack }) {
   }, [messages]);
 
   useEffect(() => {
-    initializeSession();
+    loadSession();
   }, [language]);
 
-  const initializeSession = async () => {
+  const loadSession = async () => {
     try {
       const newSessionId = `${language.toLowerCase()}`;
       setSessionId(newSessionId);
 
-      const response = await fetch(`${API_BASE}/api/practice/${newSessionId}/init`, {
+      // First, try to get existing history
+      const response = await fetch(`${API_BASE}/api/practice/${newSessionId}/history`, {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+
+      // If history exists and has messages, use it
+      if (data.history && data.history.length > 0) {
+        setMessages(data.history);
+      } else {
+        // No history exists, initialize with welcome message
+        await initializeNewSession(newSessionId);
+      }
+    } catch (error) {
+      console.error('Failed to load session:', error);
+      setMessages([{
+        role: 'assistant',
+        content: `Hello! Let's practice ${language} together. Start by saying something in ${language}, and I'll help you improve! 😊`,
+        timestamp: Date.now()
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const initializeNewSession = async (sessionId) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/practice/${sessionId}/init`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language })
@@ -41,13 +69,6 @@ export default function Practice({ language, onBack }) {
       }
     } catch (error) {
       console.error('Failed to initialize session:', error);
-      setMessages([{
-        role: 'assistant',
-        content: `Hello! Let's practice ${language} together. Start by saying something in ${language}, and I'll help you improve! 😊`,
-        timestamp: Date.now()
-      }]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -55,7 +76,6 @@ export default function Practice({ language, onBack }) {
     const trimmedInput = input.trim();
     if (!trimmedInput || isSending || !sessionId) return;
 
-    // Add user message optimistically
     const userMessage = {
       role: 'user',
       content: trimmedInput,
@@ -100,8 +120,7 @@ export default function Practice({ language, onBack }) {
         method: 'DELETE'
       });
 
-      // Reinitialize
-      await initializeSession();
+      await initializeNewSession(sessionId);
     } catch (error) {
       console.error('Failed to clear session:', error);
     }
@@ -119,7 +138,7 @@ export default function Practice({ language, onBack }) {
       <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <Loader className="w-12 h-12 animate-spin text-indigo-600 mx-auto" />
-          <p className="text-gray-600 mt-4">Initializing practice session...</p>
+          <p className="text-gray-600 mt-4">Loading practice session...</p>
         </div>
       </div>
     );

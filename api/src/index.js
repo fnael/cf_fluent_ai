@@ -1,6 +1,8 @@
 import { CORS_HEADERS } from "./utils/cors";
 import { validateLanguageRoute } from "./routes/validateLanguage";
 import { handlePracticeRoute } from "./routes/practice";
+import { handleTranslateRoute } from "./routes/translate";
+import { handleQuizRoute } from "./routes/quiz";
 import { healthRoute } from "./routes/health";
 
 export default {
@@ -16,6 +18,12 @@ export default {
 
     if (url.pathname.startsWith("/api/practice/"))
       return handlePracticeRoute(request, env, url);
+
+    if (url.pathname.startsWith("/api/translate") || url.pathname.startsWith("/api/lookup"))
+      return handleTranslateRoute(request, env, url);
+
+    if (url.pathname.startsWith("/api/quiz/"))
+      return handleQuizRoute(request, env, url);
 
     if (url.pathname === "/api/health")
       return healthRoute();
